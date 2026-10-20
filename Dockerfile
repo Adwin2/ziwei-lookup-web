@@ -1,7 +1,7 @@
 FROM node:22-slim AS node-deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --ignore-scripts
+COPY node_modules ./node_modules
 
 FROM python:3.12-slim
 WORKDIR /app
