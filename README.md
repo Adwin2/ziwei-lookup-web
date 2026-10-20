@@ -1,6 +1,6 @@
 # 紫微斗数查表服务
 
-围绕 [Renhuai123/ziwei-doushu](https://github.com/Renhuai123/ziwei-doushu) 开源起盘引擎与 v4.0 解读数据集的确定性查表网站。服务端不调用 AI/LLM，也不在查询时重新计算命盘，只读取预先导入的 SQLite。
+围绕 [Renhuai123/ziwei-doushu](https://github.com/Renhuai123/ziwei-doushu) 开源起盘引擎与 v4.0 解读数据集的确定性查表网站。服务端不调用 AI/LLM；查询时使用项目内接入的上游 `lib/ziwei/algorithm.ts` 起盘引擎生成完整十二宫，再读取预先导入 SQLite 中的 v4.0 解读文本。
 
 ## 本地运行
 
@@ -33,3 +33,7 @@ Compose 会先导入内置示例，再启动网站。生产部署时，把已下
 ## 来源与许可
 
 数据集：紫微斗数开源解读数据集 v4.0（674,976 张命盘 × 13 维），来源 <https://github.com/Renhuai123/ziwei-doushu>，作者王多鱼AI，CC BY 4.0。起盘引擎代码来自该项目 `lib/ziwei/`，遵循其 MIT 许可。数据集中的特定引文仍受上游说明约束。
+
+## 起盘引擎
+
+`engine/lib/ziwei/` 来自上游项目的 `lib/ziwei/`，通过 `engine/chart-runner.ts` 调用其 `generateChart()`。引擎依赖 `iztro` 和 `lunar-javascript`，按公历日期、0–11 时辰索引和性别生成完整宫位、主星、辅星、亮度及命身宫信息。

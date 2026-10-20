@@ -1,0 +1,1 @@
+{"name":"ziwei-lookup-engine","private":true,"type":"module","scripts":{"engine":"tsx engine/chart-runner.ts"},"dependencies":{"iztro":"^2.5.8","lunar-javascript":"^1.7.3"},"devDependencies":{"tsx":"^4.19.0","typescript":"^5.0.0"}}

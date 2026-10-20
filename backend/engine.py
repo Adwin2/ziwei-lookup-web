@@ -1,8 +1,9 @@
-"""与 Renhuai123/ziwei-doushu 起盘引擎对齐的展示适配层。
-完整引擎在上游 lib/ziwei/；v4 数据已按该引擎预先生成，本服务不实时计算。
-"""
-PALACES = ["命宫", "兄弟宫", "夫妻宫", "子女宫", "财帛宫", "疾厄宫", "迁移宫", "交友宫", "官禄宫", "田宅宫", "福德宫", "父母宫"]
-
-def build_palaces(first_star):
-    # v4 每行只保存命宫第一主星；空值是合法的“命无正曜”。
-    return [{"name": name, "stars": ([first_star] if i == 0 and first_star else [])} for i, name in enumerate(PALACES)]
+"""调用上游 Renhuai123/ziwei-doushu 的真实起盘引擎。"""
+import json, os, subprocess
+ROOT=os.path.dirname(os.path.dirname(__file__))
+def build_chart(year,month,day,hour,gender):
+ payload={"year":year,"month":month,"day":day,"hour":hour,"gender":gender}
+ try: r=subprocess.run(["npx","tsx","engine/chart-runner.ts",json.dumps(payload)],cwd=ROOT,text=True,capture_output=True,check=True,timeout=20)
+ except subprocess.CalledProcessError as e: raise ValueError(e.stderr.strip() or "上游起盘引擎执行失败") from e
+ except subprocess.TimeoutExpired as e: raise ValueError("上游起盘引擎响应超时") from e
+ return json.loads(r.stdout)

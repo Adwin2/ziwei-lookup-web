@@ -2,7 +2,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 import json, os, re
 from database import get_chart
-from engine import build_palaces
+from engine import build_chart
 
 ROOT = os.path.dirname(os.path.dirname(__file__))
 ATTRIBUTION = {
@@ -33,8 +33,10 @@ class Handler(BaseHTTPRequestHandler):
             return send_json(self, 400, {"error":"请提供有效的日期、0–11 时辰索引和性别。"})
         key=f"{date}-{hour}-{gender}"; row=get_chart(key)
         if not row: return send_json(self, 404, {"error":"未找到对应命盘，请检查日期、时辰和性别。", "key":key, "attribution":ATTRIBUTION})
-        first_star=row.get("ms"); interpretations=row.get("interpretations", row.get("c", {}))
-        return send_json(self, 200, {"key":key,"date":date,"hour":int(hour),"gender":gender,"palaces":build_palaces(first_star),"interpretations":[{"key":k,"title":DIMENSIONS.get(k,k),"text":v} for k,v in interpretations.items()],"attribution":ATTRIBUTION})
+        interpretations=row.get("interpretations", row.get("c", {}))
+        try: chart=build_chart(int(date[:4]),int(date[5:7]),int(date[8:10]),int(hour),gender)
+        except ValueError as exc: return send_json(self,422,{"error":str(exc),"key":key})
+        return send_json(self, 200, {"key":key,"date":date,"hour":int(hour),"gender":gender,"palaces":chart["palaces"],"engine":{"source":"Renhuai123/ziwei-doushu","mingGongBranch":chart["mingGongBranch"],"shenGongBranch":chart["shenGongBranch"],"wuxingJuName":chart["wuxingJuName"],"mingZhu":chart.get("mingZhu"),"shenZhu":chart.get("shenZhu")},"interpretations":[{"key":k,"title":DIMENSIONS.get(k,k),"text":v} for k,v in interpretations.items()],"attribution":ATTRIBUTION})
     def static(self, rel, content_type):
         p=os.path.join(ROOT, rel)
         if not os.path.isfile(p): return send_json(self,404,{"error":"文件不存在"})
