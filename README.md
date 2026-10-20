@@ -37,3 +37,9 @@ Compose 会先导入内置示例，再启动网站。生产部署时，把已下
 ## 起盘引擎
 
 `engine/lib/ziwei/` 来自上游项目的 `lib/ziwei/`，通过 `engine/chart-runner.ts` 调用其 `generateChart()`。引擎依赖 `iztro` 和 `lunar-javascript`，按公历日期、0–11 时辰索引和性别生成完整宫位、主星、辅星、亮度及命身宫信息。
+
+## 账户功能
+
+游客可以直接查盘。注册后可以保存出生资料、查看最近 20 次查询，并从资料列表快速重新查盘。账户数据保存在 SQLite；密码只保存为 PBKDF2-SHA256 哈希，登录状态使用 HttpOnly、SameSite=Lax 会话 Cookie。生产环境应在 HTTPS 反向代理后运行，并定期备份 SQLite 数据卷。
+
+账户接口：`POST /api/auth/register`、`POST /api/auth/login`、`POST /api/auth/logout`、`GET /api/auth/me`、`POST/DELETE /api/profiles`。
