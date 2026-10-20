@@ -1,0 +1,19 @@
+services:
+  ingest:
+    build: .
+    command: python scripts/ingest.py --db /app/data/ziwei.sqlite3 /app/fixtures/sample.jsonl
+    volumes:
+      - ziwei-data:/app/data
+  web:
+    build: .
+    depends_on:
+      ingest:
+        condition: service_completed_successfully
+    environment:
+      ZIWEI_DB: /app/data/ziwei.sqlite3
+    ports:
+      - "8000:8000"
+    volumes:
+      - ziwei-data:/app/data:ro
+volumes:
+  ziwei-data:
